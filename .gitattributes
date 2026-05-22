@@ -1,0 +1,28 @@
+# === Line endings ===
+*.sh text eol=lf
+*.bash text eol=lf
+/mvnw text eol=lf
+
+# === Esconder SOLO los .html en raíz de templates (no admin/user) ===
+src/main/resources/templates/base.html linguist-generated=true
+src/main/resources/templates/forgot_password.html linguist-generated=true
+src/main/resources/templates/guide.html linguist-generated=true
+src/main/resources/templates/index.html linguist-generated=true
+src/main/resources/templates/login.html linguist-generated=true
+src/main/resources/templates/message.html linguist-generated=true
+src/main/resources/templates/register.html linguist-generated=true
+src/main/resources/templates/reset_password.html linguist-generated=true
+src/main/resources/templates/view_product.html linguist-generated=true
+src/main/resources/templates/product.html linguist-generated=true
+src/main/resources/templates/admin/products linguist-generated=true
+src/main/resources/templates/admin/users linguist-generated=true
+*.png linguist-generated=true
+*.jpg linguist-generated=true
+*.jpeg linguist-generated=true
+*.gif linguist-generated=true
+*.svg linguist-generated=true
+*.ico linguist-generated=true
+target/** linguist-generated=true
+build/** linguist-generated=true
+.vscode/** linguist-generated=true
+*.iml linguist-generated=true

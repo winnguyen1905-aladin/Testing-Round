@@ -1,0 +1,78 @@
+HELP.md
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# Configuración local sensible
+src/main/resources/application-local.properties
+.env
+*.env
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+### Env ###
+.env
+application-local.properties
+
+### Logs ###
+*.log
+*.log.*
+*.log.gz
+logs/
+log/
+
+# JVM crash + diagnostic files (e.g. hs_err_pid12048.log)
+hs_err_pid*
+replay_pid*
+*.hprof
+
+# Surefire / Failsafe dump files
+*.dump
+*.dumpstream
+
+# Spring Boot rotated app logs
+spring.log
+spring.log.*
+
+### OS ###
+.DS_Store
+Thumbs.db
+
+### Temp ###
+*.tmp
+*.bak
+*.swp
+*~
+
+### Images we don't want in the repo ###
+# JFIF — Windows "Save as JPEG" often writes .jfif; product/category seed
+# images live in src/main/resources/static/img and shouldn't be committed.
+*.jfif
+*.JFIF
