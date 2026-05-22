@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{base::layout(~{::section})}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Register — 7-Eleven Testing Round</title>
+    <style>body { background: var(--ec-gray-50); }</style>
+</head>
+
+<body>
+<section>
+
+    <div class="container pt-4">
+        <th:block th:if="${session.succMsg}">
+            <div class="alert alert-ecomm alert-success mx-auto" style="max-width:700px;">
+                <i class="fa-solid fa-circle-check fa-lg"></i>
+                [[${session.succMsg}]]
+            </div>
+        </th:block>
+        <th:block th:if="${session.errorMsg}">
+            <div class="alert alert-ecomm alert-danger mx-auto" style="max-width:700px;">
+                <i class="fa-solid fa-circle-exclamation fa-lg"></i>
+                [[${session.errorMsg}]]
+            </div>
+        </th:block>
+    </div>
+
+    <div class="auth-page py-4">
+        <div class="auth-card">
+            <div class="row g-0">
+
+                <div class="col-lg-5 auth-image d-none d-lg-flex" style="background: linear-gradient(135deg, var(--ec-blue) 0%, #7b2ff7 100%);">
+                    <div class="text-center text-white">
+                        <i class="fa-solid fa-user-plus fa-4x mb-3 opacity-75"></i>
+                        <h3 class="fw-bold">Create a test account</h3>
+                        <p class="opacity-75 mb-0">Create your account and enjoy exclusive offers</p>
+                    </div>
+                </div>
+
+                <div class="col-lg-7">
+                    <div class="card-header pb-0">
+                        <h4 class="fw-bold mb-0 pt-3">
+                            <i class="fa-solid fa-user-plus me-2" style="color:var(--ec-primary);"></i>Create Account
+                        </h4>
+                        <p class="text-muted small mt-1 mb-0">Fill in your details to register</p>
+                    </div>
+
+                    <div class="card-body">
+                        <form action="/saveUser" enctype="multipart/form-data" method="post">
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-sm-6">
+                                    <label class="form-label">Full Name *</label>
+                                    <input class="form-control" name="name" type="text" placeholder="Your name" required>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label class="form-label">Phone *</label>
+                                    <input class="form-control" name="mobileNumber" type="number" placeholder="+1 234 5678" required>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Email Address *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text" style="border-radius:8px 0 0 8px; border-color:var(--ec-gray-300);">
+                                        <i class="fa-solid fa-envelope text-muted"></i>
+                                    </span>
+                                    <input class="form-control" name="email" type="email" placeholder="your@email.com"
+                                           style="border-radius:0 8px 8px 0;" required>
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-sm-6">
+                                    <label class="form-label">Address *</label>
+                                    <input class="form-control" name="address" type="text" placeholder="123 Main St" required>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label class="form-label">City *</label>
+                                    <input class="form-control" name="city" type="text" placeholder="New York" required>
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-sm-6">
+                                    <label class="form-label">State *</label>
+                                    <input class="form-control" name="state" type="text" placeholder="NY" required>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label class="form-label">Zip Code *</label>
+                                    <input class="form-control" name="pinCode" type="number" placeholder="10001" required>
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-sm-6">
+                                    <label class="form-label">Password *</label>
+                                    <div class="password-wrapper">
+                                        <input class="form-control" name="password" type="password" id="reg-pwd"
+                                               placeholder="Min. 6 characters" style="padding-right:2.5rem;" required>
+                                        <button type="button" class="toggle-pwd" onclick="togglePwd('reg-pwd', this)">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label class="form-label">Confirm Password *</label>
+                                    <div class="password-wrapper">
+                                        <input class="form-control" name="confirmPassword" type="password" id="reg-conf"
+                                               placeholder="Repeat password" style="padding-right:2.5rem;" required>
+                                        <button type="button" class="toggle-pwd" onclick="togglePwd('reg-conf', this)">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Profile Image (optional)</label>
+                                <input class="form-control" name="img" type="file" accept="image/*">
+                            </div>
+
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="terms" style="accent-color:var(--ec-primary);" required>
+                                <label class="form-check-label small text-muted" for="terms">
+                                    I agree to the <a href="#" class="fw-bold" style="color:var(--ec-primary);">Terms & Conditions</a>
+                                </label>
+                            </div>
+
+                            <button type="submit" class="btn-ecomm w-100 py-2">
+                                <i class="fa-solid fa-user-plus me-2"></i>Create My Account
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="card-footer text-center py-3" style="background:var(--ec-gray-50); border-top:1px solid var(--ec-gray-100);">
+                        <p class="mb-0 small text-muted">
+                            Already have an account?
+                            <a href="/signin" class="fw-bold text-decoration-none" style="color:var(--ec-primary);">
+                                Sign in <i class="fa-solid fa-arrow-right ms-1"></i>
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function togglePwd(id, btn) {
+            const input = document.getElementById(id);
+            const icon = btn.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+    </script>
+</section>
+</body>
+
+</html>
