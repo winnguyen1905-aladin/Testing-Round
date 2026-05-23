@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{base::layout(~{::section})}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Categories — Admin</title>
+</head>
+
+<body>
+<section>
+    <div class="container py-4">
+        <h2 class="fw-bold mb-4">
+            <i class="fa-solid fa-tags me-2" style="color:var(--ec-primary);"></i>Categories
+        </h2>
+
+        <div class="row g-4">
+
+            <!-- Add Form -->
+            <div class="col-lg-4">
+                <div class="card card-ecomm">
+                    <div class="card-header">
+                        <h5 class="fw-bold mb-0">
+                            <i class="fa-solid fa-plus me-2" style="color:var(--ec-primary);"></i>New Category
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <th:block th:if="${session.succMsg}">
+                            <div class="alert alert-ecomm alert-success mb-3">
+                                <i class="fa-solid fa-circle-check fa-lg"></i>
+                                [[${session.succMsg}]]
+                            </div>
+                        </th:block>
+                        <th:block th:if="${session.errorMsg}">
+                            <div class="alert alert-ecomm alert-danger mb-3">
+                                <i class="fa-solid fa-circle-exclamation fa-lg"></i>
+                                [[${session.errorMsg}]]
+                            </div>
+                        </th:block>
+
+                        <form action="/admin/saveCategory" method="post" enctype="multipart/form-data">
+                            <div class="mb-3">
+                                <label class="form-label">Category Name</label>
+                                <input type="text" name="name" class="form-control" placeholder="e.g. Electronics" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Status</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="isActive" id="catActive" value="true" checked style="accent-color:var(--ec-primary);">
+                                    <label class="form-check-label" for="catActive">Active</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="isActive" id="catInactive" value="false" style="accent-color:var(--ec-primary);">
+                                    <label class="form-check-label" for="catInactive">Inactive</label>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Image (optional)</label>
+                                <input type="file" name="file" class="form-control" accept="image/*">
+                            </div>
+                            <button type="submit" class="btn-ecomm w-100">
+                                <i class="fa-solid fa-plus me-1"></i>Add
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- List -->
+            <div class="col-lg-8">
+                <div class="card card-ecomm">
+                    <div class="card-header">
+                        <h5 class="fw-bold mb-0">Existing Categories</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-modern mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Image</th>
+                                        <th>Name</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="cat, c : ${categorys}">
+                                        <td data-label="#">[[${c.count}]]</td>
+                                        <td data-label="Image">
+                                            <img th:if="${cat.imageName != null and !cat.imageName.isEmpty()}"
+                                                 th:src="${cat.imageName}"
+                                                 width="48" height="48"
+                                                 class="rounded object-fit-cover"
+                                                 onerror="this.src='/img/default-category.png'">
+                                            <img th:unless="${cat.imageName != null and !cat.imageName.isEmpty()}"
+                                                 src="/img/default-category.png"
+                                                 width="48" height="48"
+                                                 class="rounded object-fit-cover">
+                                        </td>
+                                        <td data-label="Name" class="fw-semibold">[[${cat.name}]]</td>
+                                        <td data-label="Status">
+                                            <th:block th:if="${cat.isActive}">
+                                                <span class="badge badge-success">Active</span>
+                                            </th:block>
+                                            <th:block th:unless="${cat.isActive}">
+                                                <span class="badge badge-danger">Inactive</span>
+                                            </th:block>
+                                        </td>
+                                        <td data-label="Actions">
+                                            <a th:href="@{'/admin/loadEditCategory/' + ${cat.id}}"
+                                               class="btn btn-sm" style="color:var(--ec-blue);" title="Edit">
+                                                <i class="fa-solid fa-pen-to-square"></i>
+                                            </a>
+                                            <a th:href="@{'/admin/deleteCategory/' + ${cat.id}}"
+                                               class="btn btn-sm" style="color:var(--ec-primary);"
+                                               title="Delete"
+                                               onclick="return confirm('Delete this category?')">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

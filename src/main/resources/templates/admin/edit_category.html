@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{base::layout(~{::section})}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Category — Admin</title>
+</head>
+
+<body>
+<section>
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-5">
+                <div class="card card-ecomm">
+                    <div class="card-header">
+                        <h4 class="fw-bold mb-0">
+                            <i class="fa-solid fa-pen-to-square me-2" style="color:var(--ec-primary);"></i>Edit Category
+                        </h4>
+                    </div>
+                    <div class="card-body">
+
+                        <th:block th:if="${session.succMsg}">
+                            <div class="alert alert-ecomm alert-success mb-3">
+                                <i class="fa-solid fa-circle-check fa-lg"></i>
+                                [[${session.succMsg}]]
+                            </div>
+                        </th:block>
+                        <th:block th:if="${session.errorMsg}">
+                            <div class="alert alert-ecomm alert-danger mb-3">
+                                <i class="fa-solid fa-circle-exclamation fa-lg"></i>
+                                [[${session.errorMsg}]]
+                            </div>
+                        </th:block>
+
+                        <form action="/admin/updateCategory" method="post" enctype="multipart/form-data">
+                            <input type="hidden" name="id" th:value="${category.id}">
+
+                            <div class="mb-3">
+                                <label class="form-label">Name</label>
+                                <input type="text" name="name" class="form-control" th:value="${category.name}" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Status</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="isActive" value="true"
+                                           id="catA" th:checked="${category.isActive == true}" style="accent-color:var(--ec-primary);">
+                                    <label class="form-check-label" for="catA">Active</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="isActive" value="false"
+                                           id="catI" th:checked="${category.isActive == false}" style="accent-color:var(--ec-primary);">
+                                    <label class="form-check-label" for="catI">Inactive</label>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">New Image</label>
+                                <input type="file" name="file" class="form-control" accept="image/*">
+                            </div>
+
+                            <div class="text-center mb-3">
+                                <img th:if="${category.imageName != null and !category.imageName.isEmpty()}"
+                                     th:src="${category.imageName}"
+                                     width="80" height="80"
+                                     class="rounded object-fit-cover"
+                                     onerror="this.src='/img/default-category.png'">
+                                <img th:unless="${category.imageName != null and !category.imageName.isEmpty()}"
+                                     src="/img/default-category.png"
+                                     width="80" height="80"
+                                     class="rounded object-fit-cover">
+                            </div>
+
+                            <button type="submit" class="btn-ecomm w-100">
+                                <i class="fa-solid fa-check me-1"></i>Update
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>
