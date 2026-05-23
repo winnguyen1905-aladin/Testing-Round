@@ -1,0 +1,49 @@
+# Keep the Docker build context small so `COPY src` and `COPY pom.xml`
+# don't drag in build artifacts, IDE state, or secrets.
+
+# Build output
+target/
+build/
+*.class
+*.jar
+*.war
+
+# Local dev / IDE
+.idea/
+.vscode/
+.settings/
+.project
+.classpath
+*.iml
+*.iws
+*.ipr
+
+# OS noise
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Secrets and env files — must never leak into images
+.env
+.env.*
+!.env.production.example
+
+# Crash & misc logs from prior runs
+hs_err_pid*.log
+replay_pid*.log
+*.log
+logs/
+
+# Tests artifacts
+target/playwright-screenshots/
+target/surefire-reports/
+
+# CI/CD config — not needed inside the image
+.github/
+docker-compose*.yml
+README.md
+MIGRATION_GUIDE.md
