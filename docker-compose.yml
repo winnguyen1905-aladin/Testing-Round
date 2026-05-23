@@ -1,0 +1,74 @@
+# Production-style compose for the CD server.
+#
+# CD flow on the server:
+#   1. `cp .env.production.example .env` and fill in real secrets (once).
+#   2. `docker compose pull`   — pulls the image tag from APP_IMAGE.
+#   3. `docker compose up -d`  — (re)creates only the changed services.
+#
+# Local dev:
+#   `docker compose up --build` builds from the local Dockerfile and tags it
+#   as $APP_IMAGE (defaults to ecommerce-spring:local).
+
+name: ecommerce
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: ecommerce-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-ecommerce_db}
+      POSTGRES_USER: ${POSTGRES_USER:-ecom}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ecom} -d ${POSTGRES_DB:-ecommerce_db}"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 10s
+    # DB port stays on the internal network only — not exposed to the host.
+    # Uncomment if you need to connect from outside the docker network.
+    # ports:
+    #   - "127.0.0.1:5432:5432"
+
+  app:
+    # Set APP_IMAGE in .env to the registry tag pushed by CI, e.g.
+    #   APP_IMAGE=ghcr.io/your-org/ecommerce-spring:abc1234
+    image: ${APP_IMAGE:-ecommerce-spring:local}
+    # `build:` lets local devs run `docker compose up --build` and ignores
+    # this section when the server runs `docker compose pull && up -d`.
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ecommerce-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://db:5432/${POSTGRES_DB:-ecommerce_db}?user=${POSTGRES_USER:-ecom}&password=${POSTGRES_PASSWORD}"
+      SPRING_DATASOURCE_DRIVER: org.postgresql.Driver
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
+      SPRING_MAIL_HOST: ${SPRING_MAIL_HOST:-smtp.gmail.com}
+      SPRING_MAIL_PORT: ${SPRING_MAIL_PORT:-587}
+      SPRING_MAIL_USERNAME: ${SPRING_MAIL_USERNAME}
+      SPRING_MAIL_PASSWORD: ${SPRING_MAIL_PASSWORD}
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
+      JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS:--XX:MaxRAMPercentage=75.0}
+    ports:
+      # Host port (left of colon) defaults to 7410 for the server deploy.
+      # Override via APP_PORT in .env if you need a different host port.
+      # Container always listens on 8080 (Spring Boot default) — do not change.
+      - "${APP_PORT:-7410}:8080"
+    # NOTE: the Alpine JRE base image has no curl/wget/bash, so a meaningful
+    # in-container healthcheck would require either adding tooling to the
+    # Dockerfile or pulling in Spring Boot Actuator. Skipping it keeps the
+    # image lean; deploy verification happens from the CI runner via HTTP.
+
+volumes:
+  postgres-data:
+    name: ecommerce_postgres_data
