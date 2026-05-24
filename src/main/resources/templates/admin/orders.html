@@ -99,8 +99,8 @@
                                 <td data-label="Change Status">
                                     <th:block th:if="${o.status != 'Cancelled' and o.status != 'Delivered'}">
                                         <form action="/admin/status-order-update" method="post" class="d-flex gap-2">
-                                            <select class="form-control form-control-sm" name="status" style="font-size:.8rem;">
-                                                <option value="">-- Status --</option>
+                                            <select class="form-control form-control-sm" name="status" style="font-size:.8rem;" required>
+                                                <option value="" disabled selected>-- Status --</option>
                                                 <option value="1">In Progress</option>
                                                 <option value="2">Received</option>
                                                 <option value="3">Packed</option>

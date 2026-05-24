@@ -10,6 +10,7 @@ import com.ecom.Ecommerce_SpringBoot.util.CommonUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -21,6 +22,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -130,7 +132,9 @@ class AdminProductWebTest {
 
     @Test
     void updateProduct_redirectsBackToEditScreen() throws Exception {
+        Product existing = TestFixtures.product("Original"); existing.setId(7);
         Product updated = TestFixtures.product("Updated"); updated.setId(7);
+        when(productService.getProductById(7)).thenReturn(existing);
         when(productService.updateProduct(any(Product.class))).thenReturn(updated);
 
         mockMvc.perform(multipart("/admin/updateProduct").file(EMPTY_IMG)
@@ -145,6 +149,49 @@ class AdminProductWebTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/admin/editProduct/7"));
         verify(productService).updateProduct(any(Product.class));
+    }
+
+    @Test
+    void updateProduct_withEmptyImage_preservesExistingImageUrl() throws Exception {
+        // The edit form does not echo the current image URL back, so without server-side
+        // fallback the product's image would get wiped to null on every non-image edit.
+        Product existing = TestFixtures.product("Original"); existing.setId(8);
+        existing.setImage("https://cdn.example.com/keep-me.jpg");
+        when(productService.getProductById(8)).thenReturn(existing);
+        when(productService.updateProduct(any(Product.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        mockMvc.perform(multipart("/admin/updateProduct").file(EMPTY_IMG)
+                        .param("id", "8")
+                        .param("title", "Renamed")
+                        .param("description", "x")
+                        .param("category", "Cat")
+                        .param("price", "100.0")
+                        .param("stock", "5")
+                        .param("discount", "0")
+                        .param("isActive", "true"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/admin/editProduct/8"));
+
+        ArgumentCaptor<Product> captor = ArgumentCaptor.forClass(Product.class);
+        verify(productService).updateProduct(captor.capture());
+        assertThat(captor.getValue().getImage()).isEqualTo("https://cdn.example.com/keep-me.jpg");
+    }
+
+    @Test
+    void updateProduct_missingProduct_redirectsToList() throws Exception {
+        when(productService.getProductById(404)).thenReturn(null);
+
+        mockMvc.perform(multipart("/admin/updateProduct").file(EMPTY_IMG)
+                        .param("id", "404")
+                        .param("title", "Ghost")
+                        .param("description", "x")
+                        .param("category", "Cat")
+                        .param("price", "1.0")
+                        .param("stock", "0")
+                        .param("isActive", "true"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/admin/products"));
+        verify(productService, never()).updateProduct(any());
     }
 
     @Test
