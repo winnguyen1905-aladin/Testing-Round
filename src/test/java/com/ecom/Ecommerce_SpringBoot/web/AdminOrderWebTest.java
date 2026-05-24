@@ -109,6 +109,29 @@ class AdminOrderWebTest {
     }
 
     @Test
+    void updateStatus_missingStatusParam_redirectsWithoutServiceCall() throws Exception {
+        // Form's placeholder option submits status="" — controller must reject without 400.
+        mockMvc.perform(post("/admin/status-order-update")
+                        .param("id", "14"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/admin/orders"));
+
+        verify(orderService, never()).orderStatusUpdate(anyInt(), anyString());
+    }
+
+    @Test
+    void updateStatus_unknownStatusId_doesNotCallService() throws Exception {
+        // Status ID outside the StatusOrder enum range must not blank out the DB column.
+        mockMvc.perform(post("/admin/status-order-update")
+                        .param("id", "15")
+                        .param("status", "999"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/admin/orders"));
+
+        verify(orderService, never()).orderStatusUpdate(anyInt(), anyString());
+    }
+
+    @Test
     void updateStatus_mailFailure_doesNotBreakRedirect() throws Exception {
         when(orderService.orderStatusUpdate(anyInt(), anyString()))
                 .thenReturn(sampleOrder(13, StatusOrder.DELIVERED.getName()));

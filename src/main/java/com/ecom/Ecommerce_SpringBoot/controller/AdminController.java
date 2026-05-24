@@ -200,28 +200,26 @@ public class AdminController {
     @PostMapping("/updateProduct")
     public String updateProduct(@ModelAttribute Product product, @RequestParam("file") MultipartFile image,
                                 HttpSession session) {
-        String currentImageUrl = product.getImage();
-        if (!image.isEmpty()) {
+        Product existing = productService.getProductById(product.getId());
+        if (existing == null) {
+            session.setAttribute("errorMsg", "Product not found");
+            return "redirect:/admin/products";
+        }
+
+        // Preserve the existing image unless a new one is uploaded — the edit form
+        // does not echo the current URL back, so product.getImage() is always null here.
+        String imageUrl = existing.getImage();
+        if (image != null && !image.isEmpty()) {
             try {
-                currentImageUrl = cloudinaryService.uploadImage(image, "products");
+                imageUrl = cloudinaryService.uploadImage(image, "products");
             } catch (IOException e) {
                 session.setAttribute("errorMsg", "Image update failed");
                 return "redirect:/admin/editProduct/" + product.getId();
             }
         }
+        product.setImage(imageUrl);
 
-        product.setImage(currentImageUrl);
         Product updated = productService.updateProduct(product);
-
-        // Después de asignar la imagen...
-        if (product.getDiscount() == null) {
-            product.setDiscount(0);
-        }
-        if (product.getPrice() != null) {
-            double discountPercent = product.getDiscount() / 100.0;
-            product.setDiscountPrice(product.getPrice() * (1 - discountPercent));
-        }
-
         if (updated != null) {
             session.setAttribute("succMsg", "Product updated");
         } else {
@@ -254,14 +252,24 @@ public class AdminController {
     }
 
     @PostMapping("/status-order-update")
-    public String updateStatusOrder(@RequestParam int id, @RequestParam int status, HttpSession session) {
-        StatusOrder[] values = StatusOrder.values();
+    public String updateStatusOrder(@RequestParam int id,
+                                    @RequestParam(required = false) Integer status,
+                                    HttpSession session) {
+        // Status comes from a <select> whose placeholder option has value="" — submitting
+        // it without picking would 400 on a primitive int param. Accept Integer and reject
+        // null/unknown values explicitly so the user gets a flash message instead.
         String oStatus = null;
-        for (StatusOrder s : values) {
-            if (s.getId().equals(status)) {
-                oStatus = s.getName();
-                break;
+        if (status != null) {
+            for (StatusOrder s : StatusOrder.values()) {
+                if (s.getId().equals(status)) {
+                    oStatus = s.getName();
+                    break;
+                }
             }
+        }
+        if (oStatus == null) {
+            session.setAttribute("errorMsg", "Please select a valid status");
+            return "redirect:/admin/orders";
         }
 
         ProductOrder order = orderService.orderStatusUpdate(id, oStatus);
