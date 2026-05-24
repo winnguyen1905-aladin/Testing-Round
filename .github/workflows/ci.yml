@@ -28,7 +28,7 @@ jobs:
   # ============================================================
   test:
     name: Unit + Web + Integration tests
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64]
     timeout-minutes: 15
     permissions:
       contents: read
@@ -76,7 +76,7 @@ jobs:
     name: Build & push image to Docker Hub
     needs: test
     if: github.event_name == 'push'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64]
     timeout-minutes: 20
     permissions:
       contents: read
