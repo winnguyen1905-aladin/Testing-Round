@@ -45,7 +45,7 @@ jobs:
           cache: maven
 
       - name: Run tests
-        run: mvn -B --no-transfer-progress test
+        run: ./mvnw -B --no-transfer-progress test
 
       - name: Upload surefire reports
         if: always()
